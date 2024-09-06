@@ -1,0 +1,57 @@
+﻿@model NguyenQuocNhut_SachOnline.Models.NHAXUATBAN
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+
+<h3 style="color:red">Bạn có chắc chắn muốn xoá nhà xuất bản này không?</h3>
+<div>
+    <h4>XOÁ NHÀ XUẤT BẢN</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            Mã nhà xuất bản:
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MaNXB)
+        </dd>
+        <dt>
+            Tên nhà xuất bản:
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TenNXB)
+        </dd>
+
+        <dt>
+            Địa chỉ:
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DiaChi)
+        </dd>
+
+        <dt>
+            Số điện thoại:
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DienThoai)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+<div class="form-actions no-color">
+    @Html.ActionLink("Trở lại danh sách", "Index") |
+
+    <input type="submit" value="Xoá" class="btn btn-default" />
+</div>
+    }
+</div>

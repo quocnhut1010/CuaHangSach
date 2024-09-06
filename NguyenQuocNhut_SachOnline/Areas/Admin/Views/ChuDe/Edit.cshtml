@@ -1,0 +1,42 @@
+﻿@model NguyenQuocNhut_SachOnline.Models.CHUDE
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+<div class="form-horizontal">
+    <h4>CHỈNH SỬA CHỦ ĐỀ</h4>
+    <hr />
+    <div class="form-group">
+        <label class="control-label col-md-2">Mã Chủ Đề:</label>
+        <div class="col-md-10">
+            @*Chỉ hiển thị mã chủ đề không cho sửa*@
+            <input type="text" size="130" name="MaCD" value="@Model.MaCD" readonly />
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.TenChuDe, "Tên chủ đề", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.TenChuDe, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.TenChuDe, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Lưu" class="btn btn-default" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Trở lại danh sách", "Index")
+</div>

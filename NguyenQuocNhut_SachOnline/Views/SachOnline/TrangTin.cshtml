@@ -1,0 +1,19 @@
+﻿@model NguyenQuocNhut_SachOnline.Models.TRANGTIN
+@{ 
+    ViewBag.Title = "TrangTin";
+    Layout = "~/Views/Shared/LayoutUser.cshtml";
+}
+
+<h3>@Model.TenTrang</h3>
+<h5> Ngày đăng: @Html.FormatValue(@Model.NgayTao, "{0:dd/MM/yyyy}")</h5>
+    <hr />
+    <div>`
+        @Html.Raw(Model.NoiDung)
+    </div>
+    <br />
+    <br />
+          <p>
+              @Html.ActionLink("Trở lại trang chủ", "Index")
+          </p>
+
+

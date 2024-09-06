@@ -1,0 +1,85 @@
+﻿
+@{
+    ViewBag.Title = "ChiTietSach";
+    Layout = "~/Views/Shared/LayoutUser.cshtml";
+}
+@*<style>
+        .thumbnail {
+            float: right;
+            text-align: left;
+        }
+            .thumbnail .info-box {
+                float: right;
+                margin-top: 10px;
+            }
+
+                .thumbnail .info-box p {
+                    text-align: left;
+                }
+            .thumbnail .giaban span {
+                font-size: 1.2em;
+                color: #0000ff;
+            }
+
+    </style>*@
+<style>
+    .thumbnail {
+        overflow: hidden;
+    }
+
+        .thumbnail img {
+            max-width: 100%;
+        }
+
+        .thumbnail h4.tensach {
+            text-align: center;
+        }
+
+        .thumbnail .motasach p {
+            text-align: justify;
+        }
+
+        .thumbnail .info-box {
+            margin-top: 10px;
+        }
+
+            .thumbnail .info-box p {
+                text-align: right; /* Align the information to the right */
+                margin: 5px 0;
+            }
+
+        .thumbnail .giaban span {
+            font-size: 1.2em;
+            color: #0000ff;
+        }
+
+        .thumbnail .addtocard {
+            text-align: right; /* Align the "Add to Cart" button to the right */
+        }
+</style>
+
+
+
+<div class="thumbnail">
+    <h4 class="tensach">
+        @Model.TenSach
+    </h4>
+    <img src="~/Images/@Model.AnhBia" alt=" @Model.TenSach">
+    <div class="motasach">
+        <p>
+            @Html.Raw(@Model.MoTa.ToString().Replace("\n", "</p><p>&nbsp&nbsp&nbsp&nbsp&nbsp"))
+        </p>
+    </div>
+    <div class="info-box">
+        <p class="ngaycapnhat">Ngày cập nhật: @Html.FormatValue(@Model.NgayCapNhat, "{0:dd/MM/yyyy}")</p>
+        <p class="giaban">Giá bán: <span>@Html.FormatValue(@Model.GiaBan, "{0:#,##0}") VNĐ</span></p>
+        <p class="addtocard">
+            <a href="@Url.Action("ThemGioHang","GioHang", new { ms = Model.MaSach, url =
+Request.Url.ToString() }) "
+               class="btn btn-primary" role="button">
+                <span class="glyphicon glyphicon-shopping-cart"
+                      aria-hidden="true"></span> Add to Cart
+            </a>
+        </p>
+    </div>
+</div>

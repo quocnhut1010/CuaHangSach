@@ -1,0 +1,83 @@
+﻿@model PagedList.PagedList<NguyenQuocNhut_SachOnline.Models.DONDATHANG>
+@using NguyenQuocNhut_SachOnline.Models
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h2 style="text-align:center;">QUẢN LÍ ĐƠN HÀNG</h2>
+<p class="btn btn-warning" role="button" style="background-color: #00ffff; color: #fff">
+    @Html.ActionLink("Thêm mới", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th style="text-align:center;width:140px">
+            Mã đơn hàng
+        </th>
+        <th style="text-align:center;width:140px">
+            Tình trạng thanh toán
+        </th>
+        <th style="text-align:center;width:140px">
+            Tình trạng giao hàng
+        </th>
+        <th style="text-align:center;width:140px">
+            Ngày đặt
+        </th>
+        <th style="text-align:center;width:140px">
+            Ngày giao
+        </th>
+        <th style="text-align:center;width:140px">
+            Mã khách hàng
+        </th>
+        <th style="text-align:center"></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaDonHang)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DaThanhToan)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TinhTrangGiaoHang)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NgayDat)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NgayGiao)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaKH)
+            </td>
+            <td>
+                <a href="@Url.Action("Edit", new { id = item.MaDonHang })" class="btn btn-warning" role="button"
+                   style="background-color: #f39c12; color: #fff;">Sửa</a>
+
+                <a href="@Url.Action("Details", new { id = item.MaDonHang })" class="btn btn-primary" role="button"
+                   style="background-color: #007bff; color: #fff;">Chi tiết</a>
+
+                <a href="@Url.Action("Delete", new { id = item.MaDonHang })" class="btn btn-danger" role="button"
+                   style="background-color: #dc3545; color: #fff;">Xóa</a>
+            </td>
+        </tr>
+    }
+
+</table>
+@*Tạo liên kết phần trang*@
+Trang @(Model.PageCount < Model.PageNumber ? 0 :
+Model.PageNumber)/@Model.PageCount
+<div class="MenuTrang">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }))
+</div>
+<style>
+    .MenuTrang {
+        display: inline;
+        text-align: center;
+    }
+</style>

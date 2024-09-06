@@ -1,0 +1,296 @@
+﻿@model PagedList.PagedList<NguyenQuocNhut_SachOnline.Models.KHACHHANG>
+@using NguyenQuocNhut_SachOnline.Models
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<p>
+    <button class="btn btn-success" id="btnAdd">
+        <i class="fa fa-plus" aria-hidden="true"></i>
+        Thêm Khách Hàng
+    </button>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th class="col-ms 9">
+                Tên Khách Hàng
+            </th>
+            <th class="col-ms-9">
+                Tài Khoản
+            </th>
+            <th class="col-ms-9">
+                Mật Khẩu
+            </th>
+            <th class="col-ms-9">
+                Email
+            </th>
+            <th class="col-ms-9">
+                Địa chỉ
+            </th>
+            <th class="col-ms-9">
+                Điện thoại
+            </th>
+            <th class="col-ms-9">
+                Ngày Sinh
+            </th>
+            <th class="col-ms 9" style="text-align:right">
+                Các Chức Năng
+            </th>
+
+        </tr>
+    </thead>
+    <tbody id="tblDsKH">
+    </tbody>
+</table>
+<div class="modal fade" id="modalKhachHang" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenter Title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="modalTitle"></div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <input type="text" id="maKH" value="" hidden />
+                        <!-- Inside your modal content -->
+                        <label>Tên khách hàng </label>
+                        <input type="text" class="form-control" id="txtTenKhachHang"
+                               placeholder="Tên khách hàng" readonly />
+                        <label>Tài khoản </label>
+                        <input type="text" class="form-control" id="txtTaiKhoan"
+                               placeholder="Tài khoản" readonly />
+                        <label>Mật Khẩu</label>
+                        <input type="text" class="form-control" id="txtMatKhau"
+                               placeholder="Mật Khẩu" readonly />
+                        <label>Email</label>
+                        <input type="text" class="form-control" id="txtEmail"
+                               placeholder="Email" readonly />
+                        <label>Địa chỉ</label>
+                        <input type="text" class="form-control" id="txtDiaChi"
+                               placeholder="Địa chỉ" readonly />
+
+                        <label>Điện thoại</label>
+                        <input type="text" class="form-control" id="txtDienThoai"
+                               placeholder="Điện thoại" readonly />
+                        <label>Ngày sinh</label>
+                        <input type="text" class="form-control" id="txtNgaySinh"
+                               placeholder="Ngày Sinh" readonly />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnSubmit">Lưu</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        LoadDsKH();
+    });
+    function LoadDsKH() {
+        $.ajax({
+            url: '/Admin/KhachHang1/DsKH',
+            type: 'get',
+            success: function (data) {
+                $('#tblDsKH').empty();
+                data.forEach(function (kh) {
+                    let s = '<tr id="' + kh.MaKH + '">';
+                    //  s += '<td class="col-ms-9">' + nxb.TenNXB + '</td>';
+                    s += '<td class="col-ms-9">' + kh.HoTen + '</td>';
+                    s += '<td class="col-ms-9">' + kh.TaiKhoan + '</td>';
+                    s += '<td class="col-ms-9">' + kh.MatKhau + '</td>';
+                    s += '<td class="col-ms-9">' + kh.Email + '</td>';
+                    s += '<td class="col-ms-9">' + kh.DiaChi + '</td>';
+                    s += '<td class="col-ms-9">' + kh.DienThoai + '</td>';
+                    //  s += '<td class="col-ms-9">' + formatDate(kh.NgaySinh) + '</td>';
+                    // Định dạng ngày trước khi hiển thị
+                    let ngaySinh = new Date(kh.NgaySinh);
+                    let ngaySinhFormatted = ngaySinh.toLocaleDateString();
+
+                    s += '<td class="col-ms-9">' + ngaySinhFormatted + '</td>';
+                    s += '<td class="col-ms-3 text-right">';
+                    s += '<button class="btn btn-sm btn-info" name="view"><i class="fa fa-info-circle" aria-hidden="true"></i></button>&nbsp;';
+                    s += '<button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>&nbsp;';
+                    s += '<button class="btn btn-sm btn-danger" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button>&nbsp;';
+                    s += '</td>';
+                    s += '</tr>';
+                    $('#tblDsKH').append(s);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error(error); // Log any potential errors in the console
+            }
+        });
+    }
+    // View Details Function
+    $(document).on('click', "button[name='view']", function () {
+        let idKH = $(this).closest('tr').attr('id');
+
+        $.ajax({
+            url: '/Admin/KhachHang1/Detail',
+            type: 'get',
+            data: { maKH: idKH },
+            success: function (data) {
+                //$('#txtTenNhaXuatBan').val(data.TenNXB);
+                //$('#txtTenNhaXuatBan').prop('readonly', true);
+                $('#txtTenKhachHang').val(data.HoTen);
+                $('#txtTaiKhoan').val(data.TaiKhoan);
+                $('#txtMatKhau').val(data.MatKhau);
+                $('#txtEmail').val(data.Email);
+                $('#txtDiaChi').val(data.DiaChi);
+                $('#txtDienThoai').val(data.DienThoai);
+                $('#txtNgaySinh').val(data.NgaySinh);
+                $('#txtTenKhachHang,#txtTaiKhoan,#txtMatKhau,#txtEmail, #txtDiaChi, #txtDienThoai, #txtNgaySinh').prop('readonly', true);
+                $('#btnSubmit').hide();
+                $('#modalTitle').text('Xem chi tiết khách hàng');
+                $('#modalKhachHang').modal();
+            },
+            error: function (xhr, status, error) {
+                console.error(error); // Log any potential errors in the console
+            }
+        });
+    });
+    // Add Customer Function
+    $('#btnAdd').on('click', function () {
+        // Reset modal fields
+        $('#txtTenKhachHang, #txtTaiKhoan, #txtMatKhau, #txtEmail, #txtDiaChi, #txtDienThoai, #txtNgaySinh').val('');
+        $('#txtTenKhachHang, #txtTaiKhoan, #txtMatKhau, #txtEmail, #txtDiaChi, #txtDienThoai, #txtNgaySinh').prop('readonly', false);
+        $('#btnSubmit').show();
+        $('#modalTitle').text('Thêm Khách Hàng');
+        $('#modalKhachHang').modal();
+    });
+
+    // Save Customer Function (Add or Update)
+    $('#btnSubmit').on('click', function () {
+        var maKH = $('#maKH').val();
+        var hoTen = $('#txtTenKhachHang').val();
+        var taiKhoan = $('#txtTaiKhoan').val();
+        var matKhau = $('#txtMatKhau').val();
+        var email = $('#txtEmail').val();
+        var diaChi = $('#txtDiaChi').val();
+        var dienThoai = $('#txtDienThoai').val();
+        var ngaySinh = $('#txtNgaySinh').val(); // Note: Ensure proper date format here
+
+        if (maKH === '') {
+            // Adding new customer
+            $.ajax({
+                url: '/Admin/KhachHang1/AddKH',
+                type: 'post',
+                data: {
+                    hoTen: hoTen,
+                    taiKhoan: taiKhoan,
+                    matKhau: matKhau,
+                    email: email,
+                    diaChi: diaChi,
+                    dienThoai: dienThoai,
+                    ngaySinh: ngaySinh
+                },
+                success: function (data) {
+                    if (data.success) {
+                        $('#modalKhachHang').modal('hide');
+                        LoadDsKH(); // Reload the customer list
+                    } else {
+                        // Handle errors if needed
+                        console.error(data.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(error); // Log any potential errors in the console
+                }
+            });
+        } else {
+            // Update existing customer
+            $.ajax({
+                url: '/Admin/KhachHang1/Update',
+                type: 'post',
+                data: {
+                    maKH: maKH,
+                    hoTen: hoTen,
+                    taiKhoan: taiKhoan,
+                    matKhau: matKhau,
+                    email: email,
+                    diaChi: diaChi,
+                    dienThoai: dienThoai,
+                    ngaySinh: ngaySinh
+                },
+                success: function (data) {
+                    if (data.success) {
+                        $('#modalKhachHang').modal('hide');
+                        LoadDsKH(); // Reload the customer list
+                    } else {
+                        // Handle errors if needed
+                        console.error(data.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(error); // Log any potential errors in the console
+                }
+            });
+        }
+    });
+    // Update Details Function
+    $(document).on('click', "button[name='update']", function () {
+        let idKH = $(this).closest('tr').attr('id');
+
+        $.ajax({
+            url: '/Admin/KhachHang1/Detail',
+            type: 'get',
+            data: { maKH: idKH },
+            success: function (data) {
+                $('#maKH').val(data.MaKH);
+                $('#txtTenKhachHang').val(data.HoTen);
+                $('#txtTaiKhoan').val(data.TaiKhoan);
+                $('#txtMatKhau').val(data.MatKhau);
+                $('#txtEmail').val(data.Email);
+                $('#txtDiaChi').val(data.DiaChi);
+                $('#txtDienThoai').val(data.DienThoai);
+                $('#txtNgaySinh').val(data.NgaySinh);
+                $('#txtTenKhachHang,#txtTaiKhoan,#txtMatKhau,#txtEmail,#txtDiaChi,#txtDienThoai,#txtNgaySinh').prop('readonly', false);
+                $('#btnSubmit').show();
+                $('#modalTitle').text('Cập nhật thông tin khách hàng');
+                $('#modalKhachHang').modal();
+            },
+            error: function (xhr, status, error) {
+                console.error(error); // Log any potential errors in the console
+            }
+        });
+    });
+    // Delete Customer Function
+    $(document).on('click', "button[name='delete']", function () {
+        var idKH = $(this).closest('tr').attr('id');
+        if (confirm('Bạn thực sự muốn xóa Nhà xuất bản này.'))
+            $.ajax({
+                url: '/Admin/KhachHang1/Delete',
+                type: 'post',
+                data: { maKH: idKH },
+                success: function (data) {
+                    if (data.success) {
+                        LoadDsKH(); // Reload the customer list
+                    } else {
+                        // Handle errors if needed
+                        console.error(data.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(error); // Log any potential errors in the console
+                }
+            });
+    });
+
+</script>
+
+@*Tạo liên kết phần trang*@
+Trang @(Model.PageCount < Model.PageNumber ? 0 :
+Model.PageNumber)/@Model.PageCount
+<div class="MenuTrang">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }))
+</div>
+<style>
+    .MenuTrang {
+        display: inline;
+        text-align: center;
+    }
+</style>

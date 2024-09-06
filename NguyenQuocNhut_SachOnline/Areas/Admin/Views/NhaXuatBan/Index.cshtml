@@ -1,0 +1,367 @@
+﻿@model PagedList.PagedList<NguyenQuocNhut_SachOnline.Models.NHAXUATBAN>
+@using NguyenQuocNhut_SachOnline.Models
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+
+<p>
+    <button class="btn btn-success" id="btnAdd">
+        <i class="fa fa-plus" aria-hidden="true"></i>
+        Thêm Nhà Xuất Bản
+    </button>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th class="col-ms 9">
+                Tên Nhà Xuất Bản
+            </th>
+            <th class="col-ms-9">
+                Địa chỉ
+            </th>
+            <th class="col-ms-9">
+                Điện thoại
+            </th>
+            <th class="col-ms 9" style="text-align:right">
+                Các Chức Năng
+            </th>
+
+        </tr>
+    </thead>
+    <tbody id="tblDsNXB">
+    </tbody>
+</table>
+<div class="modal fade" id="modalNhaXuatBan" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenter Title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="modalTitle"></div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <input type="text" id="maNXB" value="" hidden />
+                        <!-- Inside your modal content -->
+                        <label>Tên nhà xuất bản </label>
+                        <input type="text" class="form-control" id="txtTenNhaXuatBan"
+                               placeholder="Tên nhà xuất bản" readonly />
+                        <label>Địa chỉ</label>
+                        <input type="text" class="form-control" id="txtDiaChi"
+                               placeholder="Địa chỉ" readonly />
+
+                        <label>Điện thoại</label>
+                        <input type="text" class="form-control" id="txtDienThoai" 
+                               placeholder="Điện thoại" readonly />
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnSubmit">Lưu</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        LoadDsNXB();
+    });
+
+    function LoadDsNXB() {
+        $.ajax({
+            url: '/Admin/NhaXuatBan/DsNXB',
+            type: 'get',
+            success: function (data) {
+                $('#tblDsNXB').empty();
+                data.forEach(function (nxb) {
+                    let s = '<tr id="' + nxb.MaNXB + '">';
+                  //  s += '<td class="col-ms-9">' + nxb.TenNXB + '</td>';
+                    s += '<td class="col-ms-9">' + nxb.TenNXB + '</td>';
+                    s += '<td class="col-ms-9">' + nxb.DiaChi + '</td>';
+                    s += '<td class="col-ms-9">' + nxb.DienThoai + '</td>';
+                    s += '<td class="col-ms-3 text-right">';
+                    s += '<button class="btn btn-sm btn-info" name="view"><i class="fa fa-info-circle" aria-hidden="true"></i></button>&nbsp;';
+                    s += '<button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>&nbsp;';
+                    s += '<button class="btn btn-sm btn-danger" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button>&nbsp;';
+                    s += '</td>';
+                    s += '</tr>';
+                    $('#tblDsNXB').append(s);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error(error); // Log any potential errors in the console
+            }
+        });
+    }
+
+    // View Details Function
+    $(document).on('click', "button[name='view']", function () {
+        let idNXB = $(this).closest('tr').attr('id');
+
+        $.ajax({
+            url: '/Admin/NhaXuatBan/Detail',
+            type: 'get',
+            data: { maNXB: idNXB },
+            success: function (data) {
+                if (data !== null) {
+                    $('#txtTenNhaXuatBan').val(data.TenNXB);
+                    $('#txtDiaChi').val(data.DiaChi);
+                    $('#txtDienThoai').val(data.DienThoai);
+                    $('#txtTenNhaXuatBan, #txtDiaChi, #txtDienThoai').prop('readonly', true);
+                    $('#btnSubmit').hide();
+                    $('#modalTitle').text('Xem chi tiết Nhà xuất bản');
+                    $('#modalNhaXuatBan').modal();
+                } else {
+                    // Handle the case when the record is not found
+                    alert('Không tìm thấy thông tin Nhà xuất bản');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+            }
+        });
+    });
+
+    // Add New Nhà Xuất Bản Function
+    $('#btnAdd').click(function () {
+        $('#modalTitle').text('Thêm mới Nhà xuất bản');
+        $('#maNXB').val(0); // Set the maCD value to 0 for adding a new topic
+        //$('#txtTenNhaXuatBan').val('');
+        //$('#txtTenNhaXuatBan').prop('readonly', false);
+        $('#txtTenNhaXuatBan').val('');
+        $('#txtDiaChi').val('');
+        $('#txtDienThoai').val('');
+        $('#txtTenNhaXuatBan, #txtDiaChi, #txtDienThoai').prop('readonly', false);
+        $('#btnSubmit').show();
+        $('#modalNhaXuatBan').modal();
+    });
+
+    // Save New or Update Nhà Xuất Bản Function
+    $(document).on('click', '#btnSubmit', function () {
+        let idNXB = $('#maNXB').val();
+        let updatedName = $('#txtTenNhaXuatBan').val();
+        let updatedAddress = $('#txtDiaChi').val();
+        let updatedPhoneNumber = $('#txtDienThoai').val();
+
+        let url = (idNXB === '0') ? '/Admin/NhaXuatBan/AddNXB' : '/Admin/NhaXuatBan/Update';
+
+        $.ajax({
+            url: url,
+            type: 'post',
+            data: {
+                maNXB: idNXB,
+                strTenNXB: updatedName,
+                strDiaChi: updatedAddress,
+                strDienThoai: updatedPhoneNumber
+            },
+            success: function (data) {
+                alert(data.message);
+                $('#modalNhaXuatBan').modal('hide');
+                LoadDsNXB(); // Refresh the list of topics after an update
+            },
+            error: function (xhr, status, error) {
+                console.error(error); // Log any potential errors in the console
+            }
+        });
+    });
+
+    // Update Nhà Xuất Bản Function
+    $(document).on('click', "button[name='update']", function () {
+        let idNXB = $(this).closest('tr').attr('id');
+
+        $.ajax({
+            url: '/Admin/NhaXuatBan/Detail',
+            type: 'get',
+            data: { maNXB: idNXB },
+            success: function (data) {
+                if (data !== null) {
+                    $('#txtTenNhaXuatBan').val(data.TenNXB);
+                    $('#txtDiaChi').val(data.DiaChi);
+                    $('#txtDienThoai').val(data.DienThoai);
+                    $('#txtTenNhaXuatBan, #txtDiaChi, #txtDienThoai').prop('readonly', false);
+                    $('#btnSubmit').show();
+                    $('#modalTitle').text('Cập nhật Nhà xuất bản');
+                    $('#maNXB').val(idNXB);
+                    $('#modalNhaXuatBan').modal();
+                } else {
+                    // Handle the case when the record is not found
+                    alert('Không tìm thấy thông tin Nhà xuất bản');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+            }
+        });
+    });
+    // Delete Nhà Xuất Bản Function
+    $(document).on('click', "button[name='delete']", function () {
+        let idNXB = $(this).closest('tr').attr('id');
+
+        if (confirm('Bạn thực sự muốn xóa Nhà xuất bản này.')) {
+            $.ajax({
+                url: '/Admin/NhaXuatBan/Delete',
+                type: 'post',
+                data: { maNXB: idNXB },
+                success: function (data) {
+                    alert(data.message);
+                    LoadDsNXB();
+                },
+                error: function (xhr, status, error) {
+                    console.error(error); // Log any potential errors in the console
+                }
+            });
+        }
+    });
+
+</script>
+
+@*<script>
+
+        $(document).ready(function () {
+            LoadDsNXB();
+        });
+
+        function LoadDsNXB() {
+            $.ajax({
+                url: '/Admin/NhaXuatBan/DsNXB',
+                type: 'get',
+                success: function (data) {
+                    if (data.code === 200) {
+                        $('#tblDsNXB').empty();
+                        $.each(data.dsNXB, function (k, v) {
+                            let s = '<tr id="' + v.MaNXB + '">';
+                            s += '<td class="col-ms-9">' + v.TenNXB + '</td>';
+                            s += '<td class="col-ms-3 text-right">';
+                            s += '<button class="btn btn-sm btn-info" name="view"><i class="fa fa-info-circle" aria-hidden="true"></i></button>&nbsp;';
+                            s += '<button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>&nbsp;';
+                            s += '<button class="btn btn-sm btn-danger" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button>&nbsp;';
+                            s += '</td>';
+                            s += '</tr>';
+                            $('#tblDsNXB').append(s);
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(error); // Log any potential errors in the console
+                }
+            });
+        }
+
+    </script>
+    <script>
+
+        // View Details Function
+        $(document).on('click', "button[name='view']", function () {
+            let idNXB = $(this).closest('tr').attr('id');
+
+            $.ajax({
+                url: '/Admin/NhaXuatBan/Detail',
+                type: 'get',
+                data: { maNXB: idNXB },
+                success: function (data) {
+                    if (data.code === 200) {
+                        $('#txtTenNhaXuatBan').val(data.nxb.TenNXB);
+                        $('#txtTenNhaXuatBan').prop('readonly', true);
+                        $('#btnSubmit').hide();
+                        $('#modalTitle').text('Xem chi tiết Nhà xuất bản');
+                        $('#modalNhaXuatBan').modal();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        });
+        // Add New Topic Function
+        $('#btnAdd').click(function () {
+            $('#modalTitle').text('Thêm mới Nhà xuất bản');
+            $('#maNXB').val(0); // Set the maCD value to 0 for adding a new topic
+            $('#txtTenNhaXuatBan').val('');
+            $('#txtTenNhaXuatBan').prop('readonly', false);
+            $('#btnSubmit').show();
+            $('#modalNhaXuatBan').modal();
+        });
+        // Save New Topic Function
+        $(document).on('click', '#btnSubmit', function () {
+            let idNXB = $('#maNXB').val();
+            let updatedName = $('#txtTenNhaXuatBan').val();
+            let url = (idNXB === '0') ? '/Admin/NhaXuatBan/AddNXB' : '/Admin/NhaXuatBan/Update';
+
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { maNXB: idNXB, strTenNXB: updatedName },
+                success: function (data) {
+                    if (data.code === 200) {
+                        alert("Nhà xuất bản được cập nhật thành công!");
+                        $('#modalNhaXuatBan').modal('hide');
+                        LoadDsNXB(); // Refresh the list of topics after an update
+                    } else {
+                        alert("Lỗi: " + data.msg);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(error); // Log any potential errors in the console
+                }
+            });
+        });
+        // Update Topic Function
+        $(document).on('click', "button[name='update']", function () {
+            let idNXB = $(this).closest('tr').attr('id');
+
+            $.ajax({
+                url: '/Admin/NhaXuatBan/Detail',
+                type: 'get',
+                data: { maNXB: idNXB },
+                success: function (data) {
+                    if (data.code === 200) {
+                        $('#txtTenNhaXuatBan').val(data.nxb.TenNXB);
+                        $('#txtTenNhaXuatBan').prop('readonly', false);
+                        $('#btnSubmit').show();
+                        $('#modalTitle').text('Cập nhật Nhà xuất bản');
+                        $('#maNXB').val(idNXB);
+                        $('#modalNhaXuatBan').modal();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        });
+        // Delete Topic Function
+        $(document).on('click', "button[name='delete']", function () {
+            let idNXB = $(this).closest('tr').attr('id');
+
+            if (confirm('Bạn thực sự muốn xóa Nhà xuát bản này.')) {
+                $.ajax({
+                    url: '/Admin/NhaXuatBan/Delete',
+                    type: 'post',
+                    data: { maNXB: idNXB },
+                    success: function (data) {
+                        if (data.code === 200) {
+                            alert(data.msg);
+                            LoadDsNXB();
+                        } else {
+                            alert(data.msg);
+                        }
+                    }
+                });
+            }
+        });
+    </script>*@
+
+
+@*Tạo liên kết phần trang*@
+Trang @(Model.PageCount < Model.PageNumber ? 0 :
+Model.PageNumber)/@Model.PageCount
+<div class="MenuTrang">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }))
+</div>
+<style>
+    .MenuTrang {
+        display: inline;
+        text-align: center;
+    }
+</style>

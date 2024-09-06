@@ -1,0 +1,274 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<style>
+    .item-img {
+        max-width: 100px;
+    }
+
+    .item-desc {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 6;
+    }
+</style>
+<script src="~/ckeditor/ckeditor.js"></script>
+<p>
+    <button class="btn btn-success" id="btnAdd">
+        <i class="fa fa-plus" aria-hidden="true"></i> Thêm sách
+    </button>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên sách</th>
+            <th>Mô tả</th>
+            <th>Ảnh</th>
+            <th class="col-sm-1 ">Số lượng</th>
+            <th class="col-sm-1 ">Giá bán</th>
+            <th class="col-sm-1 ">Tên chủ đề</th>
+            <th class="col-sm-2 ">Tên nhà xuất bản</th>
+            <th class="col-sm-2 ">Các chức năng</th>
+        </tr>
+    </thead>
+    <tbody id="tblDsSach"></tbody>
+</table>
+
+<div class="modal fade" id="modalSach" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="panel panel-primary">
+                <div class="panel-heading" id="modalTitle"></div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <input type="text" id="maSach" value="" hidden />
+                        <label>Tên sách</label>
+                        <input type="text" class="form-control" id="txtTenSach" placeholder="Tên sách" />
+                        <label>Mô tả</label>
+                        <textarea class="form-control" id="txtMoTa"></textarea>
+                        <label>Ảnh</label>
+                        <input type="file" id="fileAnh" />
+                        <label>Số lượng</label>
+                        <input type="number" class="form-control" id="txtSoLuong" />
+                        <label>Giá bán</label>
+                        <input type="number" class="form-control" id="txtGiaBan" />
+                        <label>Tên chủ đề</label>
+                        <input type="text" class="form-control" id="txtTenCD" placeholder="Tên chủ đề" />
+                        <label>Tên nhà xuất bản</label>
+                        <input type="text" class="form-control" id="txtTenNXB" placeholder="Tên nhà xuất bản" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary pull-right" id="btnSubmit">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    //if (typeof CKEDITOR !== 'undefined') {
+    //    CKEDITOR.replace('txtMoTa');
+    //}
+
+    $(document).ready(function () {
+        CKEDITOR.replace('txtMoTa');
+        loadDsSach();
+    });
+
+    function loadDsSach() {
+        $.ajax({
+            url: '/Admin/SachOnline1/DsSach',
+            type: 'get',
+            success: function (data) {
+                console.log(data);
+                if (data.code == 200) {
+                    $('#tblDsSach').empty();
+                    $.each(data.dsSach, function (k, v) {
+                        let s = '<tr id="' + v.MaSach + '">';
+                        s += '<td>' + v.TenSach + '</td>';
+                        s += '<td><span class="item-desc">' + v.MoTa + '</span></td>';
+                        s += '<td><img src="/Images/' + v.Anh + '" class="img-rounded item-img" /></td>';
+                        s += '<td>' + v.SoLuong + '</td>';
+                        s += '<td>' + v.GiaBan + '</td>';
+                        s += '<td>' + v.TenCD + '</td>';
+                        s += '<td>' + v.TenNXB + '</td>';
+                        s += '<td class="col-ms-3 text-right">';
+                        s += '<button class="btn btn-sm btn-info" name="view"><i class="fa fa-info-circle" aria-hidden="true"></i></button>&nbsp;';
+                        s += '<button class="btn btn-sm btn-warning" name="update"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>&nbsp;';
+                        s += '<button class="btn btn-sm btn-danger" name="delete"><i class="fa fa-trash" aria-hidden="true"></i></button>&nbsp;';
+                        s += '</td>';
+                        s += '</tr>';
+                        $('#tblDsSach').append(s);
+                    })
+                }
+            }
+        });
+    }
+
+    function clearModalFields(isUpdate) {
+        // Clear the values of input fields in the modal
+        $('#txtTenSach').val('');
+        CKEDITOR.instances.txtMoTa.setData('');
+        $('#txtSoLuong').val('');
+        $('#txtGiaBan').val('');
+        $('#txtTenCD').val('');
+        $('#txtTenNXB').val('');
+
+
+        // Disable or enable the TenSach field based on the operation type
+        $('#txtTenSach').prop('readonly', isUpdate);
+    }
+
+    $(document).on('click', 'button[name="view"]', function () {
+        let idSach = $(this).closest('tr').attr('id');
+        $.ajax({
+            url: '/Admin/SachOnline1/Details',
+            type: 'get',
+            data: {
+                maSach: idSach
+            },
+            success: function (data) {
+                if (data.code == 200) {
+                    $('#txtTenSach').val(data.sach.TenSach);
+                    $('#txtTenSach').prop('readonly', true);
+
+                    // Update the MoTa field in the details modal
+                    CKEDITOR.instances.txtMoTa.setData(data.sach.MoTa);
+
+                    $('#txtSoLuong').val(data.sach.SoLuong);
+                    $('#txtSoLuong').prop('readonly', true);
+                    $('#txtGiaBan').val(data.sach.GiaBan);
+                    $('#txtGiaBan').prop('readonly', true);
+                    $('#txtTenCD').val(data.sach.TenCD);
+                    $('#txtTenCD').prop('readonly', true);
+                    $('#txtTenNXB').val(data.sach.TenNXB);
+                    $('#txtTenNXB').prop('readonly', true);
+
+                    $('#btnSubmit').hide();
+                    $('#modalTitle').text('Xem chi tiết sách');
+                    $('#modalSach').modal();
+                } else {
+                    alert(data.msg);
+                }
+            }
+        });
+    });
+
+
+
+
+    $('#btnAdd').click(function () {
+        $('#modalTitle').text('Thêm mới sách');
+        $('#maSach').val('');
+        clearModalFields(false); // Clear fields for add operation
+        $('#btnSubmit').show();
+        $('#modalSach').modal();
+    })
+
+    $(document).on('click', 'button[name="update"]', function () {
+        let idSach = $(this).closest('tr').attr('id');
+        $.ajax({
+            url: '/Admin/SachOnline1/Details',
+            type: 'get',
+            data: {
+                maSach: idSach
+            },
+            success: function (data) {
+                if (data.code == 200) {
+                    $('#txtTenSach').val(data.sach.TenSach);
+                    CKEDITOR.instances.txtMoTa.setData(data.sach.MoTa);
+                    $('#txtSoLuong').val(data.sach.SoLuong);
+                    $('#txtGiaBan').val(data.sach.GiaBan);
+                    $('#txtTenCD').val(data.sach.TenCD);
+                    $('#txtTenNXB').val(data.sach.TenNXB);
+                    $('#btnSubmit').show();
+                    $('#modalTitle').text('Cập nhật sách');
+                    $('#maSach').val(idSach)
+                    $('#modalSach').modal();
+                } else {
+                    alert(data.msg);
+                }
+            }
+        });
+    });
+
+
+    $(document).on('click', 'button[name="delete"]', function () {
+        let idSach = $(this).closest('tr').attr('id');
+        if (confirm('Xác nhận xoá sách này')) {
+            $.ajax({
+                url: '/Admin/SachOnline1/Delete',
+                type: 'post',
+                data: {
+                    maSach: idSach
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        alert(data.msg);
+                        loadDsSach();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+    });
+
+    $('#btnSubmit').click(function () {
+        let maSach = $('#maSach').val().trim();
+        let url = maSach === '' ? '/Admin/SachOnline1/Create' : '/Admin/SachOnline1/Edit';
+
+        let strTenSach = $('#txtTenSach').val().trim();
+        let moTa = CKEDITOR.instances.txtMoTa.getData().trim();
+        let fileAnh = $('#fileAnh')[0].files[0];
+        let tenCD = $('#txtTenCD').val().trim();
+        let tenNXB = $('#txtTenNXB').val().trim();
+        let soLuong = $('#txtSoLuong').val().trim();
+        let giaBan = $('#txtGiaBan').val().trim();
+
+        let formData = new FormData();
+        formData.append('maSach', maSach);
+        formData.append('strTenSach', strTenSach);
+        formData.append('moTa', moTa);
+        formData.append('tenCD', tenCD);
+        formData.append('tenNXB', tenNXB);
+
+        if (soLuong.length > 0) {
+            formData.append('soLuong', soLuong);
+        }
+
+        if (giaBan.length > 0) {
+            formData.append('giaBan', giaBan);
+        }
+
+        if (fileAnh) {
+            formData.append('fileAnh', fileAnh);
+        }
+
+        $.ajax({
+            url: url,
+            type: 'post',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                if (data.code === 200) {
+                    alert(data.msg);
+                    $('#modalSach').modal('hide');
+                    loadDsSach();
+                    clearModalFields(maSach !== '');
+                } else {
+                    alert(data.msg);
+                }
+            }
+        });
+    });
+
+
+
+</script>

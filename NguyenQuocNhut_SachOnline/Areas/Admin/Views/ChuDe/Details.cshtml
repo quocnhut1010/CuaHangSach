@@ -1,0 +1,32 @@
+﻿@model NguyenQuocNhut_SachOnline.Models.CHUDE
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+
+<div>
+    <h4>CHỦ ĐỀ</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            Mã chủ đề:
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MaCD)
+        </dd>
+        <dt>
+            Tên chủ đề:
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TenChuDe)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Sửa", "Edit", new { id = Model.MaCD }) |
+    @Html.ActionLink("Trở lại danh sách", "Index")
+</p>
